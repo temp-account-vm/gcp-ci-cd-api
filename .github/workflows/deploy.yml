@@ -22,10 +22,6 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Terraform destroy (optional)
-      working-directory: ./infra
-      run: terraform destroy -auto-approve
-
     - name: Set GH_PAT environment variable
       run: echo "GH_PAT=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
@@ -47,6 +43,10 @@ jobs:
 
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
+
+    - name: Terraform destroy (optional)
+      working-directory: ./infra
+      run: terraform destroy -auto-approve
 
     - name: Terraform init
       working-directory: ./infra
