@@ -29,10 +29,12 @@ jobs:
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
 
-    - name: Terraform Init
+    - name: Terraform init
+      working-directory: ./infra
       run: terraform init
 
-    - name: Terraform Apply
+    - name: Terraform apply
+      working-directory: ./infra
       run: terraform apply -auto-approve
       env:
         TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
