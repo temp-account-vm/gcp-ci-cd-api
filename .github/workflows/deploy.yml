@@ -22,7 +22,7 @@ jobs:
       run: echo "GH_PAT=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
 
     - name: Set up Google Cloud credentials
-      uses: google-github-actions/auth@v1
+      uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
@@ -45,7 +45,7 @@ jobs:
         echo "IP=$(terraform output -raw instance_ip)" >> $GITHUB_ENV
 
     - name: Set up SSH for Ansible
-      uses: webfactory/ssh-agent@v0.8.1
+      uses: webfactory/ssh-agent@v0.9.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
