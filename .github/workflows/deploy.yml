@@ -40,18 +40,10 @@ jobs:
 
     - name: Terraform init
       working-directory: ./infra
-      env:
-        TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
-        TF_VAR_region: ${{ secrets.GCP_REGION }}
-        TF_VAR_zone: ${{ secrets.GCP_ZONE }}
       run: terraform init
 
     - name: Terraform apply
       working-directory: ./infra
-      env:
-        TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
-        TF_VAR_region: ${{ secrets.GCP_REGION }}
-        TF_VAR_zone: ${{ secrets.GCP_ZONE }}
       run: terraform apply -auto-approve
 
     - name: Get VM IP from Terraform output
