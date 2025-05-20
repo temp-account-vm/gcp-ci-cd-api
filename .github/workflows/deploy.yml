@@ -32,7 +32,7 @@ jobs:
     - name: Créer le fichier credentials.json dans infra/
       run: |
         mkdir -p infra
-        echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > infra/credentials.json
+        echo '${{ secrets.GCP_SA_KEY }}' > infra/credentials.json
 
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
