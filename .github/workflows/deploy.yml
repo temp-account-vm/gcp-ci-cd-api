@@ -100,9 +100,15 @@ jobs:
         git config --global user.email "ci-bot@example.com"
         git config --global user.name "CI Bot"
 
+    - name: Run release script
+      run: |
+        chmod +x ./release.sh
+        ./release.sh
+
     - name: Push tag and changelog
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-        git push origin main --tags
+        git push origin main
+        git push origin --tags
