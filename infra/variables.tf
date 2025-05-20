@@ -1,3 +1,11 @@
-variable "project" {}
-variable "region" {}
-variable "zone" {}
+variable "project" {
+  type = string
+}
+
+variable "region" {
+  type = string
+}
+
+variable "zone" {
+  type = string
+}
