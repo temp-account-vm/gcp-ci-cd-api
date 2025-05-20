@@ -55,7 +55,7 @@ jobs:
     - name: Save Terraform state to cache
       uses: actions/cache@v3
       with:
-        path: terraform/terraform.tfstate
+        path: infra/terraform.tfstate
         key: terraform-state-${{ github.ref }}
 
     - name: Get VM IP from Terraform output
