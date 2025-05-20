@@ -22,8 +22,18 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    - name: Terraform destroy (optional)
+      working-directory: ./infra
+      run: terraform destroy -auto-approve
+
     - name: Set GH_PAT environment variable
       run: echo "GH_PAT=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Restore Terraform state from cache
+      uses: actions/cache@v3
+      with:
+        path: terraform/terraform.tfstate
+        key: terraform-state-${{ github.ref }} 
 
     - name: Set up Google Cloud credentials
       uses: google-github-actions/auth@v2
@@ -46,10 +56,23 @@ jobs:
       working-directory: ./infra
       run: terraform apply -auto-approve
 
+    - name: Save Terraform state to cache
+      uses: actions/cache@v3
+      with:
+        path: terraform/terraform.tfstate
+        key: terraform-state-${{ github.ref }}
+
     - name: Get VM IP from Terraform output
       id: get_ip
+      working-directory: ./infra
       run: |
-        echo "IP=$(terraform output -raw instance_ip)" >> $GITHUB_ENV
+        IP=$(terraform output -raw instance_ip || echo "")
+        if [ -n "$IP" ]; then
+          echo "IP=$IP" >> $GITHUB_ENV
+        else
+          echo "No instance_ip output found"
+          exit 1
+        fi
 
     - name: Set up SSH for Ansible
       uses: webfactory/ssh-agent@v0.9.0
