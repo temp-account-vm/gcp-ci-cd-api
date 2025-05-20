@@ -44,10 +44,6 @@ jobs:
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
 
-    - name: Terraform destroy (optional)
-      working-directory: ./infra
-      run: terraform destroy -auto-approve
-
     - name: Terraform init
       working-directory: ./infra
       run: terraform init
