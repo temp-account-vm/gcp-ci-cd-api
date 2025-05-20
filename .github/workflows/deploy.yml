@@ -13,6 +13,9 @@ jobs:
       GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       GOOGLE_REGION: ${{ secrets.GCP_REGION }}
       GOOGLE_ZONE: ${{ secrets.GCP_ZONE }}
+      TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
+      TF_VAR_region: ${{ secrets.GCP_REGION }}
+      TF_VAR_zone: ${{ secrets.GCP_ZONE }}
 
     steps:
     - name: Checkout repo
@@ -26,6 +29,11 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+    - name: Créer le fichier credentials.json dans infra/
+      run: |
+        mkdir -p infra
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 -d > infra/credentials.json
+
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
 
@@ -36,10 +44,6 @@ jobs:
     - name: Terraform apply
       working-directory: ./infra
       run: terraform apply -auto-approve
-      env:
-        TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
-        TF_VAR_region: ${{ secrets.GCP_REGION }}
-        TF_VAR_zone: ${{ secrets.GCP_ZONE }}
 
     - name: Get VM IP from Terraform output
       id: get_ip
