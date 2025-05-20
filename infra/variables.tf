@@ -1,9 +1,11 @@
 variable "project" {
-  default = "lateral-pillar-460313-d7"
+  type = string
 }
+
 variable "region" {
-  default = "europe-west1"
+  type = string
 }
+
 variable "zone" {
-  default = "europe-west1-b"
+  type = string
 }

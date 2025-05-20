@@ -11,12 +11,12 @@ jobs:
 
     env:
       GOOGLE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-      GOOGLE_REGION: ${{ secrets.GCP_REGION }}
-      GOOGLE_ZONE: ${{ secrets.GCP_ZONE }}
+      GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
+      GOOGLE_ZONE: ${{ secrets.GOOGLE_ZONE }}
 
       TF_VAR_project: ${{ secrets.GCP_PROJECT_ID }}
-      TF_VAR_region: ${{ secrets.GCP_REGION }}
-      TF_VAR_zone: ${{ secrets.GCP_ZONE }}
+      TF_VAR_region: ${{ secrets.GOOGLE_REGION }}
+      TF_VAR_zone: ${{ secrets.GOOGLE_ZONE }}
 
     steps:
     - name: Checkout repo
