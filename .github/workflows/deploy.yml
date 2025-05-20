@@ -1,5 +1,8 @@
 name: Deploy API on push to main
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -92,7 +95,14 @@ jobs:
     # - name: Run Ansible playbook
     #   run: ansible-playbook -i inventory.ini ansible/deploy.yml
 
-    - name: Run release.sh (tag + changelog)
+    - name: Set up Git identity
       run: |
-        chmod +x ./release.sh
-        ./release.sh
+        git config --global user.email "ci-bot@example.com"
+        git config --global user.name "CI Bot"
+
+    - name: Push tag and changelog
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+        git push origin main --tags
