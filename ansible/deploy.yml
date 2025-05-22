@@ -5,24 +5,25 @@
   vars:
     github_token: "{{ lookup('env', 'GH_PAT') }}"
     repo_url: "https://{{ github_token }}@github.com/temp-account-vm/gcp-ci-cd-api.git"
-    app_path: "/home/debian/api"
+    app_root: "/home/debian/api"
 
   tasks:
-    - name: Installer Node.js, npm, Git, PM2
+    - name: Install dependencies
       apt:
-        name: "{{ item }}"
+        name:
+          - curl
+          - nodejs
+          - npm
+          - git
         state: present
         update_cache: yes
-      loop:
-        - curl
-        - git
-        - nodejs
-        - npm
 
-    - name: Installer PM2 globalement
-      npm:
-        name: pm2
-        global: yes
+    - name: Ensure app directory exists
+      file:
+        path: "{{ app_root }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
 
     - name: Cloner ou mettre à jour le repo
       git:
@@ -33,11 +34,14 @@
 
     - name: Installer les dépendances
       npm:
-        path: "{{ app_path }}"
-        state: present
+        path: "{{ app_path }}/api"
+        production: yes
 
-    - name: Démarrer l'API avec PM2
-      command: pm2 start {{ app_path }}/app.js --name api --update-env
-
-    - name: Sauvegarder la config PM2
-      command: pm2 save
+    - name: Start app with PM2
+      shell: |
+        npm install -g pm2
+        cd {{ app_dir }}/api
+        pm2 start index.js --name my-api || pm2 restart my-api
+        pm2 save
+      args:
+        executable: /bin/bash
