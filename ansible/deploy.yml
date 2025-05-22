@@ -28,13 +28,13 @@
     - name: Cloner ou mettre à jour le repo
       git:
         repo: "{{ repo_url }}"
-        dest: "{{ app_path }}"
+        dest: "{{ app_root }}"
         version: main
         force: yes
 
     - name: Installer les dépendances
       npm:
-        path: "{{ app_path }}/api"
+        path: "{{ app_root }}/api"
         production: yes
 
     - name: Start app with PM2
