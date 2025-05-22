@@ -4,7 +4,7 @@ set -e
 git fetch --tags
 
 if git describe --tags --abbrev=0 >/dev/null 2>&1; then
-  LAST_TAG=$(git describe --tags --abbrev=0)
+  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
   FROM_REF="$LAST_TAG..HEAD"
 else
   echo "Aucun tag trouvé. Première release."
