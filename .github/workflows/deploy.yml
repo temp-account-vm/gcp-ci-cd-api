@@ -103,7 +103,7 @@ jobs:
     - name: Create Ansible inventory file
       run: |
         echo "[api]" > inventory.ini
-        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+        echo "${{ env.IP }} ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
 
     - name: Debug inventory file
       run: cat inventory.ini
