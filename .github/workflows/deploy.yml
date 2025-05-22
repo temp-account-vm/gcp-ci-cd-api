@@ -47,6 +47,12 @@ jobs:
         mkdir -p infra
         echo '${{ secrets.GCP_SA_KEY }}' > infra/credentials.json
 
+    - name: Écrire la clé publique SSH dans un fichier
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+        chmod 644 ~/.ssh/id_rsa.pub
+
     - name: Install Terraform
       uses: hashicorp/setup-terraform@v3
 

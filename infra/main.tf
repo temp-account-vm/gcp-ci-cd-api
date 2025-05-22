@@ -37,5 +37,9 @@ resource "google_compute_instance" "default" {
     access_config {}
   }
 
+    metadata = {
+    ssh-keys = "debian:${file("~/.ssh/id_rsa.pub")}"
+  }
+
   metadata_startup_script = "sudo apt update && sudo apt install -y git"
 }
