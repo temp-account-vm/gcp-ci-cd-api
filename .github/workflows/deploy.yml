@@ -87,12 +87,6 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Add VM IP to known_hosts to avoid host verification issues
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H "$IP" >> ~/.ssh/known_hosts
-        chmod 644 ~/.ssh/known_hosts
-
     - name: Setup SSH key file
       run: |
         mkdir -p ~/.ssh
@@ -108,7 +102,7 @@ jobs:
     - name: Create Ansible inventory file
       run: |
         echo "[api]" > inventory.ini
-        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory.ini
 
     - name: Run Ansible playbook
       run: ansible-playbook -i inventory.ini ansible/deploy.yml
