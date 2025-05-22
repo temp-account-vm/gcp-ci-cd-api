@@ -25,11 +25,13 @@ else
   git log --pretty=format:"- %s" >> CHANGELOG.md
 fi
 
+echo "--- Diff de CHANGELOG.md ---"
+git diff CHANGELOG.md || true
+
 if ! git diff --quiet CHANGELOG.md; then
   git add CHANGELOG.md
   git commit -m "chore(release): $NEW_TAG [skip ci]"
+  git tag $NEW_TAG
 else
-  echo "Pas de nouveau changelog, pas de commit."
+  echo "Pas de nouveau changelog, pas de commit ni de tag."
 fi
-
-git tag $NEW_TAG
