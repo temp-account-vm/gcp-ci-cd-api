@@ -3,15 +3,7 @@ set -e
 
 git fetch --tags --force
 
-if git describe --tags --abbrev=0 >/dev/null 2>&1; then
-  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-  FROM_REF="${LAST_TAG}^..HEAD"
-else
-  echo "Aucun tag trouvé. Première release."
-  LAST_TAG="v0.0.0"
-  FROM_REF=""
-fi
-
+LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
 echo "Dernier tag : $LAST_TAG"
 
 NEW_TAG=$(echo "$LAST_TAG" | sed 's/^v//' | awk -F. '{printf "v%d.%d.%d", $1, $2, $3+1}')
@@ -23,20 +15,11 @@ if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
 fi
 
 echo "## Changelog $NEW_TAG" > CHANGELOG.md
+git log "${LAST_TAG}..HEAD" --pretty=format:"- %s" >> CHANGELOG.md || true
 
-if [ -n "$FROM_REF" ]; then
-  git log $FROM_REF --pretty=format:"- %s" >> CHANGELOG.md
-else
-  git log --pretty=format:"- %s" >> CHANGELOG.md
-fi
+echo "--- Contenu de CHANGELOG.md ---"
+cat CHANGELOG.md
 
-echo "--- Diff de CHANGELOG.md ---"
-git diff CHANGELOG.md || true
-
-if [ ! -f CHANGELOG.md ] || ! git diff --quiet CHANGELOG.md; then
-  git add CHANGELOG.md
-  git commit -m "chore(release): $NEW_TAG [skip ci]"
-  git tag $NEW_TAG
-else
-  echo "Pas de nouveau changelog, pas de commit ni de tag."
-fi
+git add CHANGELOG.md
+git commit -m "chore(release): $NEW_TAG [skip ci]"
+git tag "$NEW_TAG"
