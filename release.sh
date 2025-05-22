@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-git fetch --tags
+git fetch --tags --force
 
 if git describe --tags --abbrev=0 >/dev/null 2>&1; then
   LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-  FROM_REF="$LAST_TAG..HEAD"
+  FROM_REF="${LAST_TAG}^..HEAD"
 else
   echo "Aucun tag trouvé. Première release."
   LAST_TAG="v0.0.0"
@@ -20,6 +20,8 @@ echo "Nouveau tag : $NEW_TAG"
 echo "## Changelog $NEW_TAG" > CHANGELOG.md
 
 if [ -n "$FROM_REF" ]; then
+  echo "--- Commits depuis $FROM_REF ---"
+  git log $FROM_REF --pretty=format:"- %s"
   git log $FROM_REF --pretty=format:"- %s" >> CHANGELOG.md
 else
   git log --pretty=format:"- %s" >> CHANGELOG.md
