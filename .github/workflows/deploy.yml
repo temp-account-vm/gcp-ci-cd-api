@@ -75,6 +75,7 @@ jobs:
       working-directory: ./infra
       run: |
         IP=$(terraform output -raw instance_ip || echo "")
+        echo "IP récupérée depuis Terraform : $IP"
         if [ -n "$IP" ]; then
           echo "IP=$IP" >> $GITHUB_ENV
         else
@@ -102,7 +103,10 @@ jobs:
     - name: Create Ansible inventory file
       run: |
         echo "[api]" > inventory.ini
-        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory.ini
+        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+
+    - name: Debug inventory file
+      run: cat inventory.ini
 
     - name: Run Ansible playbook
       run: ansible-playbook -i inventory.ini ansible/deploy.yml
