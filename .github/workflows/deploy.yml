@@ -81,22 +81,25 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    # - name: Add GCP VM to known_hosts
-    #   run: ssh-keyscan -H $IP >> ~/.ssh/known_hosts
+    - name: Setup SSH key file
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
 
-    # - name: Install Ansible
-    #   run: |
-    #     sudo apt update
-    #     sudo apt install -y ansible python3-pip
-    #     pip3 install --user ansible
+    - name: Install Ansible
+      run: |
+        sudo apt update
+        sudo apt install -y ansible python3-pip
+        pip3 install --user ansible
 
-    # - name: Create Ansible inventory file
-    #   run: |
-    #     echo "[api]" > inventory.ini
-    #     echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
+    - name: Create Ansible inventory file
+      run: |
+        echo "[api]" > inventory.ini
+        echo "$IP ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa" >> inventory.ini
 
-    # - name: Run Ansible playbook
-    #   run: ansible-playbook -i inventory.ini ansible/deploy.yml
+    - name: Run Ansible playbook
+      run: ansible-playbook -i inventory.ini ansible/deploy.yml
 
     - name: Set up Git identity
       run: |
