@@ -14,14 +14,17 @@ fi
 
 echo "Dernier tag : $LAST_TAG"
 
-NEW_TAG=$(echo $LAST_TAG | sed 's/^v//' | awk -F. '{printf "v%d.%d.%d", $1, $2, $3+1}')
+NEW_TAG=$(echo "$LAST_TAG" | sed 's/^v//' | awk -F. '{printf "v%d.%d.%d", $1, $2, $3+1}')
 echo "Nouveau tag : $NEW_TAG"
+
+if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+  echo "Le tag $NEW_TAG existe déjà. Annulation."
+  exit 0
+fi
 
 echo "## Changelog $NEW_TAG" > CHANGELOG.md
 
 if [ -n "$FROM_REF" ]; then
-  echo "--- Commits depuis $FROM_REF ---"
-  git log $FROM_REF --pretty=format:"- %s"
   git log $FROM_REF --pretty=format:"- %s" >> CHANGELOG.md
 else
   git log --pretty=format:"- %s" >> CHANGELOG.md
@@ -30,7 +33,7 @@ fi
 echo "--- Diff de CHANGELOG.md ---"
 git diff CHANGELOG.md || true
 
-if ! git diff --quiet CHANGELOG.md; then
+if [ ! -f CHANGELOG.md ] || ! git diff --quiet CHANGELOG.md; then
   git add CHANGELOG.md
   git commit -m "chore(release): $NEW_TAG [skip ci]"
   git tag $NEW_TAG
