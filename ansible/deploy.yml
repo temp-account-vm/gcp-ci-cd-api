@@ -16,23 +16,23 @@
         state: present
         update_cache: yes
 
-    - name: Ajouter le dépôt NodeSource pour Node.js 22
-      shell: curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-      args:
-        executable: /bin/bash
+    - name: Install the gpg key for nodejs
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+        state: present
+    
+    - name: Install the nodejs 22 repos
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_22.x {{ ansible_distribution_release }} main"
+        state: present
+        update_cache: yes
 
-    - name: Installer Node.js 22 et npm 10
+    - name: Install the nodejs
       apt:
         name: nodejs
         state: present
 
-    - name: Vérifier la version de node
-      command: node -v
-      register: node_version
-    - debug:
-        var: node_version.stdout
-
-    - name: Vérifier la version de npm
+    - name: Check npm version
       command: npm -v
       register: npm_version
     - debug:
@@ -45,7 +45,7 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
 
-    - name: Cloner ou mettre à jour le repo
+    - name: Clone the repository
       git:
         repo: "{{ repo_url }}"
         dest: "{{ app_root }}"
@@ -53,7 +53,7 @@
         force: yes
       no_log: true
 
-    - name: Installer les dépendances
+    - name: Install npm dependencies
       npm:
         path: "{{ app_root }}/api"
         production: yes
