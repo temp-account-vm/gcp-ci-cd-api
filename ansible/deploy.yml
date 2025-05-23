@@ -3,8 +3,8 @@
   become: yes
 
   vars:
-    github_token: "{{ lookup('env', 'GH_PAT') }}"
-    repo_url: "https://{{ github_token }}@github.com/temp-account-vm/gcp-ci-cd-api.git"
+    gh_pat: "{{ gh_pat | default(lookup('env', 'GH_PAT')) }}"
+    repo_url: "https://{{ gh_pat }}@github.com/temp-account-vm/gcp-ci-cd-api.git"
     app_root: "/home/debian/api"
 
   tasks:
@@ -31,6 +31,7 @@
         dest: "{{ app_root }}"
         version: main
         force: yes
+      no_log: true
 
     - name: Installer les dépendances
       npm:

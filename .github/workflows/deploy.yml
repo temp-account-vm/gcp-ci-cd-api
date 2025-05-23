@@ -105,8 +105,12 @@ jobs:
         echo "[api]" > inventory.ini
         echo "${{ env.IP }} ansible_user=debian ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> inventory.ini
 
-    - name: Run Ansible playbook
-      run: ansible-playbook -i inventory.ini ansible/deploy.yml
+    - name: Run Ansible playbook (with GH_PAT env)
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        echo "Lancement du playbook avec GH_PAT"
+        ansible-playbook -i inventory.ini ansible/deploy.yml --extra-vars "gh_pat=${GH_PAT}"
 
     - name: Set up Git identity
       run: |
