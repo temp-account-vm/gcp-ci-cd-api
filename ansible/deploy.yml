@@ -41,7 +41,7 @@
     - name: Start app with PM2
       shell: |
         npm install -g pm2
-        cd {{ app_dir }}/api
+        cd {{ app_root }}/api
         pm2 start index.js --name my-api || pm2 restart my-api
         pm2 save
       args:
