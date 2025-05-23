@@ -12,11 +12,31 @@
       apt:
         name:
           - curl
-          - nodejs
-          - npm
           - git
         state: present
         update_cache: yes
+
+    - name: Ajouter le dépôt NodeSource pour Node.js 22
+      shell: curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+      args:
+        executable: /bin/bash
+
+    - name: Installer Node.js 22 et npm 10
+      apt:
+        name: nodejs
+        state: present
+
+    - name: Vérifier la version de node
+      command: node -v
+      register: node_version
+    - debug:
+        var: node_version.stdout
+
+    - name: Vérifier la version de npm
+      command: npm -v
+      register: npm_version
+    - debug:
+        var: npm_version.stdout
 
     - name: Ensure app directory exists
       file:
