@@ -49,13 +49,6 @@
       register: node_version_output
       changed_when: false
 
-    - name: Ensure app directory exists
-      file:
-        path: "{{ app_root }}"
-        state: directory
-        owner: "{{ ansible_user | default('debian') }}"
-        group: "{{ ansible_user | default('debian') }}"
-
     - name: Clone the repository
       git:
         repo: "{{ repo_url }}"
@@ -63,6 +56,14 @@
         version: main
         force: yes
       no_log: true
+
+    - name: Ensure the app root directory exists
+      file:
+        path: "{{ app_root }}"
+        recurse: yes
+        state: directory
+        owner: "{{ ansible_user | default('debian') }}"
+        group: "{{ ansible_user | default('debian') }}"
 
     - name: Install npm dependencies
       become: false
