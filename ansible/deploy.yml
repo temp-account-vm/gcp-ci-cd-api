@@ -15,6 +15,8 @@
         name:
           - curl
           - git
+          - build-essential
+          - libssl-dev  
         state: present
         update_cache: yes
 
@@ -26,7 +28,7 @@
       args:
         creates: "{{ nvm_dir }}"
 
-    - name: Charger NVM et installer Node.js
+    - name: Load NVM and install Node.js
       become: false
       shell: |
         export NVM_DIR="{{ nvm_dir }}"
@@ -38,7 +40,7 @@
       args:
         executable: /bin/bash
 
-    - name: Vérifier l'installation de Node.js
+    - name: Check Node.js version
       become: false
       shell: |
         export NVM_DIR="{{ nvm_dir }}"
@@ -47,16 +49,12 @@
       register: node_version_output
       changed_when: false
 
-    - name: Afficher la version installée de Node.js
-      debug:
-        msg: "Node.js version installée : {{ node_version_output.stdout }}"
-
     - name: Ensure app directory exists
       file:
         path: "{{ app_root }}"
         state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
+        owner: "{{ ansible_user | default('debian') }}"
+        group: "{{ ansible_user | default('debian') }}"
 
     - name: Clone the repository
       git:
@@ -67,12 +65,21 @@
       no_log: true
 
     - name: Install npm dependencies
-      npm:
-        path: "{{ app_root }}/api"
-        production: yes
+      become: false
+      shell: |
+        export NVM_DIR="{{ nvm_dir }}"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm use {{ node_version }}
+        cd {{ app_root }}/api
+        npm install --production
+      args:
+        executable: /bin/bash
 
     - name: Start app with PM2
       shell: |
+        export NVM_DIR="{{ nvm_dir }}"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm use {{ node_version }}
         npm install -g pm2
         cd {{ app_root }}/api
         pm2 start index.js --name my-api || pm2 restart my-api
