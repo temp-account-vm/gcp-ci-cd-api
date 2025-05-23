@@ -6,6 +6,8 @@
     gh_pat: "{{ gh_pat | default(lookup('env', 'GH_PAT')) }}"
     repo_url: "https://{{ gh_pat }}@github.com/temp-account-vm/gcp-ci-cd-api.git"
     app_root: "/home/debian/api"
+    nvm_dir: "/home/debian/.nvm"
+    node_version: "22.14.0"
 
   tasks:
     - name: Install dependencies
@@ -16,27 +18,38 @@
         state: present
         update_cache: yes
 
-    - name: Install the gpg key for nodejs
-      apt_key:
-        url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
-        state: present
-    
-    - name: Install the nodejs 22 repos
-      apt_repository:
-        repo: "deb https://deb.nodesource.com/node_22.x {{ ansible_distribution_release }} main"
-        state: present
-        update_cache: yes
+    - name: Download and install NVM
+      become: false
+      shell: |
+        export PROFILE=/home/debian/.bashrc
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+      args:
+        creates: "{{ nvm_dir }}"
 
-    - name: Install the nodejs
-      apt:
-        name: nodejs
-        state: present
+    - name: Charger NVM et installer Node.js
+      become: false
+      shell: |
+        export NVM_DIR="{{ nvm_dir }}"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm install {{ node_version }}
+        nvm alias default {{ node_version }}
+      environment:
+        NVM_DIR: "{{ nvm_dir }}"
+      args:
+        executable: /bin/bash
 
-    - name: Check npm version
-      command: npm -v
-      register: npm_version
-    - debug:
-        var: npm_version.stdout
+    - name: Vérifier l'installation de Node.js
+      become: false
+      shell: |
+        export NVM_DIR="{{ nvm_dir }}"
+        source $NVM_DIR/nvm.sh
+        node -v
+      register: node_version_output
+      changed_when: false
+
+    - name: Afficher la version installée de Node.js
+      debug:
+        msg: "Node.js version installée : {{ node_version_output.stdout }}"
 
     - name: Ensure app directory exists
       file:
